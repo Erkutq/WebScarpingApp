@@ -3,40 +3,51 @@ from bs4 import BeautifulSoup
 import requests
 import pandas
 class Sinif:
-    kitapİsimleri=[]
-    Yazarİsimleri=[]
+    kitapİsimleri_=[]
+    Yazarİsimleri_=[]
+    KitapFiyat_=[]
+
     def __init__(self,url) -> None:
         self.url="https://www.kitapyurdu.com/kategori/kitap/1.html"
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
-        Sinif.Kurİsmi(self)
+        Sinif.kitapİsim(self)
+        Sinif.KitapFiyat(self)
+        Sinif.yazarİsim(self)
+        Sinif.birlestir(self)
  
 
 
-    def Kurİsmi(self):
+    def kitapİsim(self):
         Bul=self.soup.select("li.mg-b-10>div>div:nth-child(4)")#burada yaptığım şey selenium css selecter ile kullanabilir
         # print(Bul)
         for a in Bul:
             a=a.text
-            Sinif.kitapİsimleri.append(a)
-            print(a)
+            Sinif.kitapİsimleri_.append(a)
+            
             
 
-    def Kurİsmi(self):
-        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(7)")#burada yaptığım şey selenium css selecter ile kullanabilir
+    def yazarİsim(self):
+        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(7)>a")#isimler
         # print(Bul)
         for a in Bul:
             a=a.text
-            Sinif.Yazarİsimleri.append(a)
-            print(a)
-
-    # def Fiyatlar(self):
-    #     Bul=self.soup.select("div.item>a>span:nth-child(2)")
-    #     for a in Bul:
-    #         a=a.text
-    #         Sinif.KurFiyatlar.append(a)
+            Sinif.Yazarİsimleri_.append(a)
             
-    
+
+    def KitapFiyat(self):
+        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(8)>div:nth-child(2)>span:nth-child(2)")#Kitap Fiyatları
+        # print(Bul)
+        for a in Bul:
+            a=a.text
+            Sinif.KitapFiyat_.append(a)
+          
+
+
+    def birlestir(self):
+        Birlestir=zip(Sinif.kitapİsimleri_,Sinif.Yazarİsimleri_,Sinif.KitapFiyat_)
+        df=pandas.DataFrame(Birlestir,columns=["Kitap","Yazar",'Fiyat'])
+        print(df)
     # def Birlestir(self):
     #     a=zip(Sinif.Kurİsimleri,Sinif.KurFiyatlar)
     #     df=pandas.DataFrame(a,columns=["AD".center(50," "),"Soyad".center(50," ")])
