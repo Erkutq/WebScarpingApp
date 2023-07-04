@@ -4,7 +4,7 @@ import requests
 import pandas
 class Sinif:
     kitapİsimleri=[]
-    Kurİsimleri=[]
+    Yazarİsimleri=[]
     def __init__(self,url) -> None:
         self.url="https://www.kitapyurdu.com/kategori/kitap/1.html"
         self.html=requests.get(self.url).content
@@ -22,7 +22,14 @@ class Sinif:
             print(a)
             
 
-    
+    def Kurİsmi(self):
+        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(7)")#burada yaptığım şey selenium css selecter ile kullanabilir
+        # print(Bul)
+        for a in Bul:
+            a=a.text
+            Sinif.Yazarİsimleri.append(a)
+            print(a)
+
     # def Fiyatlar(self):
     #     Bul=self.soup.select("div.item>a>span:nth-child(2)")
     #     for a in Bul:
