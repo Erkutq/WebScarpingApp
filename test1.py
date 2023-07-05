@@ -47,18 +47,15 @@ class Sinif:
 
 
     def birlestir(self):
-        Birlestir=zip(Sinif.kitapİsimleri_,Sinif.Yazarİsimleri_)
-        Birlestir=dict(Birlestir)
+        Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_)
+        Birlestir = list(Birlestir)
+       
 
-        Sinif.Sozluk['Kitap']=[Birlestir]
-
-        Sinif.Sozluk['Kitaplar']=[Sinif.KitapFiyat_]
-        # df=pandas.DataFrame(Birlestir,columns=["Kitap","Yazar",'Fiyat'])
-        # print(df)
-
+        Sinif.Sozluk['Kitap'] = Birlestir
+     
     def Yazdir(self):
         with open("Veri.json", "w", encoding="utf-8") as file:
-           json.dump(Sinif.Sozluk,file)
+            json.dump(Sinif.Sozluk,file)
 
 
     # def Birlestir(self):
