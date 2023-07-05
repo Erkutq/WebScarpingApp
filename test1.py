@@ -17,6 +17,7 @@ class Sinif:
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
+        # Sinif.read(self)
  
 
 
@@ -52,13 +53,21 @@ class Sinif:
         Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
 
         Sinif.Sozluk['Kitap'] = Birlestir
+        Sinif.Sozluk['İsim'] = Sinif.kitapİsimleri_
+
+
         # Sinif.Sozluk['Kitaplar'] = Sinif.KitapFiyat_
      
     def Yazdir(self):
         with open("Veri.json", "w", encoding="utf-8") as file:
             json.dump(Sinif.Sozluk,file)
 
-
+    def read(self):
+        with open("Veri.json","r",encoding="utf-8") as file:
+            read=json.load(file)
+            ID=read['Kitap']
+            for a in ID:
+                print(a)
     # def Birlestir(self):
     #     a=zip(Sinif.Kurİsimleri,Sinif.KurFiyatlar)
     #     df=pandas.DataFrame(a,columns=["AD".center(50," "),"Soyad".center(50," ")])
