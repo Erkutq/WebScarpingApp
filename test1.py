@@ -49,9 +49,10 @@ class Sinif:
     def birlestir(self):
         Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_)
         Birlestir = list(Birlestir)
-       
+        Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
 
         Sinif.Sozluk['Kitap'] = Birlestir
+        # Sinif.Sozluk['Kitaplar'] = Sinif.KitapFiyat_
      
     def Yazdir(self):
         with open("Veri.json", "w", encoding="utf-8") as file:
