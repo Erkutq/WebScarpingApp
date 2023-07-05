@@ -9,7 +9,9 @@ class Sinif:
     kitapİsimleri_=[]
     Yazarİsimleri_=[]
     KitapFiyat_=[]
+    KitapSayisi=-1
     Sozluk={}
+    
 
     def __init__(self,url) -> None:
         self.url=url
@@ -21,6 +23,8 @@ class Sinif:
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
         Sinif.read(self)
+        Sinif.VeriKontrol_(self)
+        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
  
 
 
@@ -58,7 +62,6 @@ class Sinif:
         Sinif.Sozluk['Kitap'] = Birlestir
 
 
-        # Sinif.Sozluk['Kitaplar'] = Sinif.KitapFiyat_
      
     def Yazdir(self):
         with open("Veri.json", "w", encoding="utf-8") as file:
@@ -67,14 +70,11 @@ class Sinif:
     def read(self):
         with open("Veri.json", "r", encoding="utf-8") as file:
             data = json.load(file)
-
-# "Kitap" sözlüğündeki fiyatları al
         kitaplar = data["Kitap"]
         kitap = [kitap[0].strip() for kitap in kitaplar.values()]
         yazar=[kitap[1].strip() for kitap in kitaplar.values()]
         fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
 
-        # Fiyatları ekrana yazdır
         for kitap,yazar,fiyat in zip(kitap,yazar,fiyat):
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
@@ -83,19 +83,35 @@ class Sinif:
                    'yazar':yazar,
                    'fiyat':fiyat,
                    }]
+            
             collection.insert_many(data)
-       
+            
+    def VeriKontrol_(self):
+        kontrol = open('Veri.json')
+        takipcilerim = json.load(takipcilerim)
 
-    # def Birlestir(self):
-    #     a=zip(Sinif.Kurİsimleri,Sinif.KurFiyatlar)
-    #     df=pandas.DataFrame(a,columns=["AD".center(50," "),"Soyad".center(50," ")])
-    #     df.drop([0,1], axis=0, inplace=True)#eğer satırdan bir verinin kaldırılmasını istiyorsak bu metodu kullanmamız gerekiyor
-    #     # df["İsim"]="MAsa" # Veri eklemek çok basit bu yöntemi kullan
-    #     print(df)
+        client = MongoClient("mongodb://localhost:27017")
+        db = client["smartmaple"]
+        collection = db["kitapyurdu"]
 
-    # def Pandas(self):
-    #     df=pandas.DataFrame(Sinif.Birlestir,index=[1,2,3,4,5],columns=["AD"])
-    #     print(df)
+        results = collection.find()
+        for document in results:
+            print(document['isim'])
+            print(Sinif.KitapSayisi)
+
+    def Dbclear(self):
+        from pymongo import MongoClient
+
+        # MongoDB'ye bağlanın
+        client = MongoClient('mongodb://localhost:27017/')
+        db = client['smartmaple']  # veritabanını seçin
+        collection = db['kitapyurdu']  # koleksiyonu seçin
+
+        # Tüm kayıtları silin
+        result = collection.delete_many({})
+
+        print("Silinen belge sayısı:", result.deleted_count)
+
 
 Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
 
