@@ -6,15 +6,17 @@ class Sinif:
     kitapİsimleri_=[]
     Yazarİsimleri_=[]
     KitapFiyat_=[]
+    Sozluk={}
 
     def __init__(self,url) -> None:
-        self.url="https://www.kitapyurdu.com/kategori/kitap/1.html"
+        self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
         Sinif.kitapİsim(self)
         Sinif.KitapFiyat(self)
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
+        Sinif.Yazdir(self)
  
 
 
@@ -45,9 +47,20 @@ class Sinif:
 
 
     def birlestir(self):
-        Birlestir=zip(Sinif.kitapİsimleri_,Sinif.Yazarİsimleri_,Sinif.KitapFiyat_)
-        df=pandas.DataFrame(Birlestir,columns=["Kitap","Yazar",'Fiyat'])
-        print(df)
+        Birlestir=zip(Sinif.kitapİsimleri_,Sinif.Yazarİsimleri_)
+        Birlestir=dict(Birlestir)
+
+        Sinif.Sozluk['Kitap']=[Birlestir]
+
+        Sinif.Sozluk['Kitaplar']=[Sinif.KitapFiyat_]
+        # df=pandas.DataFrame(Birlestir,columns=["Kitap","Yazar",'Fiyat'])
+        # print(df)
+
+    def Yazdir(self):
+        with open("Veri.json", "w", encoding="utf-8") as file:
+           json.dump(Sinif.Sozluk,file)
+
+
     # def Birlestir(self):
     #     a=zip(Sinif.Kurİsimleri,Sinif.KurFiyatlar)
     #     df=pandas.DataFrame(a,columns=["AD".center(50," "),"Soyad".center(50," ")])
