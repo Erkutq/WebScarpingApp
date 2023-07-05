@@ -9,7 +9,6 @@ class Sinif:
     kitapİsimleri_=[]
     Yazarİsimleri_=[]
     KitapFiyat_=[]
-    KitapSayisi=-1
     Sozluk={}
     
 
@@ -25,10 +24,8 @@ class Sinif:
         Sinif.Yazdir(self)
         Sinif.read(self)
         Sinif.VeriKontrol_(self)
+        print(Sinif.veriDosyasiAdet(self))
         
- 
-
-
     def kitapİsim(self):
         Bul=self.soup.select("li.mg-b-10>div>div:nth-child(4)")#burada yaptığım şey selenium css selecter ile kullanabilir
         # print(Bul)
@@ -60,7 +57,6 @@ class Sinif:
         Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_)
         Birlestir = list(Birlestir)
         Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
-
         Sinif.Sozluk['Kitap'] = Birlestir
 
 
@@ -90,6 +86,14 @@ class Sinif:
             
             collection.insert_many(data)
             
+    def veriDosyasiAdet(self):
+        with open("Veri.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+            kitaplar = data["Kitap"]
+            kitap = [kitap[0].strip() for kitap in kitaplar.items()]
+            kitap=len(kitap)
+            return(kitap)#Veri Json Dosyasında bulunan veriler
+        
     def VeriKontrol_(self):
         client = MongoClient("mongodb://localhost:27017")
         db = client["smartmaple"]
@@ -106,7 +110,6 @@ class Sinif:
                 print('veriler güncel')  
     
     def Dbclear(self):
-
         # MongoDB'ye bağlanın
         client = MongoClient('mongodb://localhost:27017/')
         db = client['smartmaple']  # veritabanını seçin
@@ -123,7 +126,7 @@ class Sinif:
     # fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
     # sayi=-1
 
-# Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
+Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
 
 
 
