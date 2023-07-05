@@ -1,2 +1,19 @@
 Project.py
 test.py
+
+
+# from pymongo import MongoClient
+
+# # MongoDB bağlantısı oluşturma
+# client = MongoClient("mongodb://localhost:27017")
+# # Veritabanı seçimi
+# db = client["mydatabase"]
+# # Koleksiyon seçimi
+# collection = db["mycollection"]
+
+# # Tüm kayıtları silmek için delete_many() kullanma #?verileri silme
+# delete_result = collection.delete_many({})
+
+# # Silinen kayıt sayısını al
+# deleted_count = delete_result.deleted_count
+# print(f"{deleted_count} kayıt başarıyla silindi.")

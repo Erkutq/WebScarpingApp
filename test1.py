@@ -2,6 +2,9 @@ import json
 from bs4 import BeautifulSoup
 import requests
 import pandas
+
+import pymongo
+from pymongo import MongoClient
 class Sinif:
     kitapİsimleri_=[]
     Yazarİsimleri_=[]
@@ -17,7 +20,7 @@ class Sinif:
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
-        # Sinif.read(self)
+        Sinif.read(self)
  
 
 
@@ -53,7 +56,6 @@ class Sinif:
         Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
 
         Sinif.Sozluk['Kitap'] = Birlestir
-        Sinif.Sozluk['İsim'] = Sinif.kitapİsimleri_
 
 
         # Sinif.Sozluk['Kitaplar'] = Sinif.KitapFiyat_
@@ -63,11 +65,27 @@ class Sinif:
             json.dump(Sinif.Sozluk,file)
 
     def read(self):
-        with open("Veri.json","r",encoding="utf-8") as file:
-            read=json.load(file)
-            ID=read['Kitap']
-            for a in ID:
-                print(a)
+        with open("Veri.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+# "Kitap" sözlüğündeki fiyatları al
+        kitaplar = data["Kitap"]
+        kitap = [kitap[0].strip() for kitap in kitaplar.values()]
+        yazar=[kitap[1].strip() for kitap in kitaplar.values()]
+        fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
+
+        # Fiyatları ekrana yazdır
+        for kitap,yazar,fiyat in zip(kitap,yazar,fiyat):
+            client = MongoClient('mongodb://localhost:27017')
+            db = client['smartmaple']
+            collection = db['kitapyurdu']
+            data=[{'isim':kitap,
+                   'yazar':yazar,
+                   'fiyat':fiyat,
+                   }]
+            collection.insert_many(data)
+       
+
     # def Birlestir(self):
     #     a=zip(Sinif.Kurİsimleri,Sinif.KurFiyatlar)
     #     df=pandas.DataFrame(a,columns=["AD".center(50," "),"Soyad".center(50," ")])
@@ -84,3 +102,6 @@ Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
 # url=requests.get("https://www.doviz.com").content
 # soup=BeautifulSoup(url,"html.parser")
 # print(soup)
+
+
+# MongoDB sunucusuna bağlanma
