@@ -23,8 +23,8 @@ class Sinif:
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
         Sinif.read(self)
-        Sinif.VeriKontrol_(self)
-        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        # Sinif.VeriKontrol_(self)
+        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
  
 
 
@@ -36,7 +36,6 @@ class Sinif:
             Sinif.kitapİsimleri_.append(a)
             
             
-
     def yazarİsim(self):
         Bul=self.soup.select("li.mg-b-10>div>div:nth-child(7)>a")#isimler
         # print(Bul)
@@ -74,33 +73,34 @@ class Sinif:
         kitap = [kitap[0].strip() for kitap in kitaplar.values()]
         yazar=[kitap[1].strip() for kitap in kitaplar.values()]
         fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
-
+        sayi=0
         for kitap,yazar,fiyat in zip(kitap,yazar,fiyat):
+            sayi+=1
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
             collection = db['kitapyurdu']
-            data=[{'isim':kitap,
-                   'yazar':yazar,
-                   'fiyat':fiyat,
+            data=[{'_id':sayi,
+                'isim':kitap,
+                'yazar':yazar,
+                'fiyat':fiyat,
                    }]
             
             collection.insert_many(data)
             
     def VeriKontrol_(self):
-        kontrol = open('Veri.json')
-        takipcilerim = json.load(takipcilerim)
-
         client = MongoClient("mongodb://localhost:27017")
         db = client["smartmaple"]
         collection = db["kitapyurdu"]
 
         results = collection.find()
-        for document in results:
-            print(document['isim'])
-            print(Sinif.KitapSayisi)
+        print(results)
+        # isim=collection.estimated_document_count()
+        # print(isim)
+        # for document in results:
+        #     print(document['_id'])
+          
 
     def Dbclear(self):
-        from pymongo import MongoClient
 
         # MongoDB'ye bağlanın
         client = MongoClient('mongodb://localhost:27017/')
