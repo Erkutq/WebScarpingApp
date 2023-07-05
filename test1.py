@@ -17,14 +17,15 @@ class Sinif:
         self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
+        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
         Sinif.kitapİsim(self)
         Sinif.KitapFiyat(self)
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
         Sinif.read(self)
-        # Sinif.VeriKontrol_(self)
-        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        Sinif.VeriKontrol_(self)
+        
  
 
 
@@ -34,6 +35,8 @@ class Sinif:
         for a in Bul:
             a=a.text
             Sinif.kitapİsimleri_.append(a)
+        bul_=len(Bul)
+        print(f'Bulunan veri sayısı: {bul_}')
             
             
     def yazarİsim(self):
@@ -73,7 +76,7 @@ class Sinif:
         kitap = [kitap[0].strip() for kitap in kitaplar.values()]
         yazar=[kitap[1].strip() for kitap in kitaplar.values()]
         fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
-        sayi=0
+        sayi=-1
         for kitap,yazar,fiyat in zip(kitap,yazar,fiyat):
             sayi+=1
             client = MongoClient('mongodb://localhost:27017')
@@ -92,14 +95,16 @@ class Sinif:
         db = client["smartmaple"]
         collection = db["kitapyurdu"]
 
-        results = collection.find()
-        print(results)
-        # isim=collection.estimated_document_count()
-        # print(isim)
-        # for document in results:
-        #     print(document['_id'])
-          
+        Json_Dosyaları = open('Veri.json')
+        Json_Dosyaları = json.load(Json_Dosyaları)
 
+        results = collection.find()
+        for document in Json_Dosyaları :
+            if document in results:
+                print('Veriler güncel değil ') 
+            else:
+                print('veriler güncel')  
+    
     def Dbclear(self):
 
         # MongoDB'ye bağlanın
@@ -113,7 +118,14 @@ class Sinif:
         print("Silinen belge sayısı:", result.deleted_count)
 
 
-Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
+
+    # yazar=[kitap[1].strip() for kitap in kitaplar.values()]
+    # fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
+    # sayi=-1
+
+# Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
+
+
 
 # url=requests.get("https://www.doviz.com").content
 # soup=BeautifulSoup(url,"html.parser")
