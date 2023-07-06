@@ -26,10 +26,8 @@ class Sinif:
         Sinif.birlestir(self)
         Sinif.Yazdir(self)
         Sinif.read(self)
-        # Sinif.VeriKontrol_(self)
-        # Sinif.DosyaOku(self)
-        # Sinif.veritabaniOku(self)
-        # Sinif.karsilastir(self)
+        Sinif.VeriKontrol_(self)
+
     
 
                 
@@ -98,11 +96,10 @@ class Sinif:
         kitapYayinci=[kitap[3].strip() for kitap in kitaplar.values()]
         sayi=-1
         for kitap,yazar,fiyat,kitapYayinci in zip(kitap,yazar,fiyat,kitapYayinci):
-            sayi+=1
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
             collection = db['kitapyurdu']
-            data=[{'_id':sayi,
+            data=[{
                 'isim':kitap,
                 'yazar':yazar,
                 'fiyat':fiyat,
