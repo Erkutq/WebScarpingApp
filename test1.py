@@ -1,4 +1,5 @@
 import json
+import time
 from bs4 import BeautifulSoup
 import requests
 import pandas
@@ -16,15 +17,16 @@ class Sinif:
         self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
-        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
-        Sinif.kitapİsim(self)
-        Sinif.KitapFiyat(self)
-        Sinif.yazarİsim(self)
-        Sinif.birlestir(self)
-        Sinif.Yazdir(self)
-        Sinif.read(self)
-        Sinif.VeriKontrol_(self)
-        print(Sinif.veriDosyasiAdet(self))
+        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        # Sinif.kitapİsim(self)
+        # Sinif.KitapFiyat(self)
+        # Sinif.yazarİsim(self)
+        # Sinif.birlestir(self)
+        # Sinif.Yazdir(self)
+        # Sinif.read(self)
+        # Sinif.VeriKontrol_(self)
+        # print(Sinif.veriDosyasiAdet(self))
+        Sinif.Yayinci(self)
         
     def kitapİsim(self):
         Bul=self.soup.select("li.mg-b-10>div>div:nth-child(4)")#burada yaptığım şey selenium css selecter ile kullanabilir
@@ -50,6 +52,19 @@ class Sinif:
         for a in Bul:
             a=a.text
             Sinif.KitapFiyat_.append(a)
+    
+    def Yayinci(self):
+        Bul = self.soup.select('li.mg-b-10>div>div:nth-child(4)>a')
+        for a in Bul:
+            Url = a['href']
+            kitap_response = requests.get(Url)
+            if kitap_response.status_code == 200:
+                kitapYayinci = BeautifulSoup(kitap_response.content, 'html.parser').select('.pr_producers__publisher a')
+                for kitapYayinci_ in kitapYayinci:
+                    print(kitapYayinci_.text)
+            kitap_response.close()  # Web sayfasını kapatma
+            time.sleep(2)
+
           
 
 
