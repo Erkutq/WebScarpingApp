@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 import pandas
 
+
+
 import pymongo
 from pymongo import MongoClient
 class Sinif:
@@ -14,10 +16,15 @@ class Sinif:
     Sozluk={}
     
 
-    def __init__(self,url) -> None:
+    def __init__(self,url,BookName,authorname,book_Price,broadcaster) -> None:
         self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
+        self.BookName=BookName
+        self.authorname=authorname
+        self.book_Price=book_Price
+        self.broadcaster=broadcaster
+    def run(self):
         Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
         Sinif.kitapİsim(self)
         Sinif.KitapFiyat(self)
@@ -28,14 +35,8 @@ class Sinif:
         Sinif.read(self)
         Sinif.VeriKontrol_(self)
 
-    
-
-                
-
-
-
     def kitapİsim(self):
-        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(4)")#burada yaptığım şey selenium css selecter ile kullanabilir
+        Bul=self.soup.select(self.BookName)#burada yaptığım şey selenium css selecter ile kullanabilir
         # print(Bul)
         for a in Bul:
             a=a.text
@@ -45,7 +46,7 @@ class Sinif:
             
             
     def yazarİsim(self):
-        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(7)>a")#isimler
+        Bul=self.soup.select(self.authorname)#isimler
         # print(Bul)
         for a in Bul:
             a=a.text
@@ -53,14 +54,14 @@ class Sinif:
             
 
     def KitapFiyat(self):
-        Bul=self.soup.select("li.mg-b-10>div>div:nth-child(8)>div:nth-child(2)>span:nth-child(2)")#Kitap Fiyatları
+        Bul=self.soup.select(self.book_Price)#Kitap Fiyatları
         # print(Bul)
         for a in Bul:
             a=a.text
             Sinif.KitapFiyat_.append(a)
     
     def Yayinci(self):
-        Bul = self.soup.select('li.mg-b-10>div>div:nth-child(4)>a')
+        Bul = self.soup.select(self.broadcaster)
         for a in Bul:
             Url = a['href']
             kitap_response = requests.get(Url)
@@ -70,9 +71,6 @@ class Sinif:
                     yayinci=kitapYayinci_.text
                     Sinif.kitapYayincilari.append(yayinci)
             kitap_response.close()  # Web sayfasını kapatma
-
-          
-
 
     def birlestir(self):
         Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_,Sinif.kitapYayincilari)
@@ -148,8 +146,13 @@ class Sinif:
     # fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
     # sayi=-1
 
-Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html")
+BookName="li.mg-b-10>div>div:nth-child(7)>a"
+authorname="li.mg-b-10>div>div:nth-child(7)>a"
+book_Price="li.mg-b-10>div>div:nth-child(8)>div:nth-child(2)>span:nth-child(2)"#Kitap Fiyatları
+broadcaster='li.mg-b-10>div>div:nth-child(4)>a'
 
+sinif=Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html",BookName,authorname,book_Price,broadcaster)
+sinif.run()
 
 
 # url=requests.get("https://www.doviz.com").content
