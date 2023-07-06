@@ -24,44 +24,60 @@ class Sinif:
         self.authorname=authorname
         self.book_Price=book_Price
         self.broadcaster=broadcaster
+        # self.veritabani=veritabani
+        
     def run(self):
-        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
         Sinif.kitapİsim(self)
         Sinif.KitapFiyat(self)
-        Sinif.Yayinci(self)
+        if(self.broadcaster=="div[class='col col-12 currentPrice']"):
+            Sinif.yayinci2(self)
+        else:
+            Sinif.yayinci2(self)
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
-        Sinif.Yazdir(self)
-        Sinif.read(self)
-        Sinif.VeriKontrol_(self)
+        # Sinif.Yazdir(self)
+        # Sinif.read(self)
+        # Sinif.VeriKontrol_(self)
 
     def kitapİsim(self):
         Bul=self.soup.select(self.BookName)#burada yaptığım şey selenium css selecter ile kullanabilir
         # print(Bul)
         for a in Bul:
-            a=a.text
+            a=a.text.strip()
             Sinif.kitapİsimleri_.append(a)
-        bul_=len(Bul)
-        print(f'Bulunan veri sayısı: {bul_}')
+            print(a)
+        # bul_=len(Bul)
+        # print(f'Bulunan veri sayısı: {bul_}')
             
             
     def yazarİsim(self):
         Bul=self.soup.select(self.authorname)#isimler
         # print(Bul)
         for a in Bul:
-            a=a.text
+            a=a.text.strip()
             Sinif.Yazarİsimleri_.append(a)
+            print(a)
             
 
     def KitapFiyat(self):
         Bul=self.soup.select(self.book_Price)#Kitap Fiyatları
         # print(Bul)
         for a in Bul:
-            a=a.text
+            a=a.text.strip()
+            Sinif.KitapFiyat_.append(a)
+            print(a)
+    
+    def yayinci2(self):
+        Bul=self.soup.select(self.broadcaster)#Kitap Fiyatları
+        # print(Bul)
+        for a in Bul:
+            a=a.text.strip()
+            print(a)
             Sinif.KitapFiyat_.append(a)
     
     def Yayinci(self):
-        Bul = self.soup.select(self.broadcaster)
+        Bul = self.soup.select("li.mg-b-10>div>div:nth-child(4)>a")
         for a in Bul:
             Url = a['href']
             kitap_response = requests.get(Url)
@@ -77,6 +93,7 @@ class Sinif:
         Birlestir = list(Birlestir)
         Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
         Sinif.Sozluk['Kitap'] = Birlestir
+        
 
 
      
@@ -92,11 +109,10 @@ class Sinif:
         yazar=[kitap[1].strip() for kitap in kitaplar.values()]
         fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
         kitapYayinci=[kitap[3].strip() for kitap in kitaplar.values()]
-        sayi=-1
         for kitap,yazar,fiyat,kitapYayinci in zip(kitap,yazar,fiyat,kitapYayinci):
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
-            collection = db['kitapyurdu']
+            collection = db[self.veritabani]
             data=[{
                 'isim':kitap,
                 'yazar':yazar,
@@ -117,7 +133,7 @@ class Sinif:
     def VeriKontrol_(self):
         client = MongoClient("mongodb://localhost:27017")
         db = client["smartmaple"]
-        collection = db["kitapyurdu"]
+        collection = db[self.veritabani]
 
         Json_Dosyaları = open('Veri.json')
         Json_Dosyaları = json.load(Json_Dosyaları)
@@ -133,7 +149,7 @@ class Sinif:
         # MongoDB'ye bağlanın
         client = MongoClient('mongodb://localhost:27017/')
         db = client['smartmaple']  # veritabanını seçin
-        collection = db['kitapyurdu']  # koleksiyonu seçin
+        collection = db['']  # koleksiyonu seçin
 
         # Tüm kayıtları silin
         result = collection.delete_many({})
@@ -145,15 +161,25 @@ class Sinif:
     # yazar=[kitap[1].strip() for kitap in kitaplar.values()]
     # fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
     # sayi=-1
-
+veritabani='kitapyurdu'
 BookName="li.mg-b-10>div>div:nth-child(7)>a"
 authorname="li.mg-b-10>div>div:nth-child(7)>a"
 book_Price="li.mg-b-10>div>div:nth-child(8)>div:nth-child(2)>span:nth-child(2)"#Kitap Fiyatları
 broadcaster='li.mg-b-10>div>div:nth-child(4)>a'
 
-sinif=Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html",BookName,authorname,book_Price,broadcaster)
-sinif.run()
+# KitapYurdu=Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html",BookName,authorname,book_Price,broadcaster,veritabani)
+# KitapYurdu.run()
 
+
+# veritabani='kitapyurdu'
+BookName_="a[class='fl col-12 text-description detailLink']"
+authorname_="a[id='productModelText']"
+book_Price_="div[class='col col-12 currentPrice']"#Kitap Fiyatları
+broadcaster_="div[class='col col-12 currentPrice']"
+
+
+KitapSepeti=Sinif("https://www.kitapsepeti.com/roman",BookName_,authorname_,book_Price_,broadcaster_)
+KitapSepeti.run()
 
 # url=requests.get("https://www.doviz.com").content
 # soup=BeautifulSoup(url,"html.parser")
