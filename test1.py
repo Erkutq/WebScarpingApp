@@ -10,6 +10,7 @@ class Sinif:
     kitapİsimleri_=[]
     Yazarİsimleri_=[]
     KitapFiyat_=[]
+    kitapYayincilari=[]
     Sozluk={}
     
 
@@ -17,17 +18,24 @@ class Sinif:
         self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
-        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
-        # Sinif.kitapİsim(self)
-        # Sinif.KitapFiyat(self)
-        # Sinif.yazarİsim(self)
-        # Sinif.birlestir(self)
-        # Sinif.Yazdir(self)
-        # Sinif.read(self)
-        # Sinif.VeriKontrol_(self)
-        # print(Sinif.veriDosyasiAdet(self))
+        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        Sinif.kitapİsim(self)
+        Sinif.KitapFiyat(self)
         Sinif.Yayinci(self)
-        
+        Sinif.yazarİsim(self)
+        Sinif.birlestir(self)
+        Sinif.Yazdir(self)
+        Sinif.read(self)
+        # Sinif.VeriKontrol_(self)
+        # Sinif.DosyaOku(self)
+        # Sinif.veritabaniOku(self)
+        # Sinif.karsilastir(self)
+    
+
+                
+
+
+
     def kitapİsim(self):
         Bul=self.soup.select("li.mg-b-10>div>div:nth-child(4)")#burada yaptığım şey selenium css selecter ile kullanabilir
         # print(Bul)
@@ -61,15 +69,15 @@ class Sinif:
             if kitap_response.status_code == 200:
                 kitapYayinci = BeautifulSoup(kitap_response.content, 'html.parser').select('.pr_producers__publisher a')
                 for kitapYayinci_ in kitapYayinci:
-                    print(kitapYayinci_.text)
+                    yayinci=kitapYayinci_.text
+                    Sinif.kitapYayincilari.append(yayinci)
             kitap_response.close()  # Web sayfasını kapatma
-            time.sleep(2)
 
           
 
 
     def birlestir(self):
-        Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_)
+        Birlestir = zip(Sinif.kitapİsimleri_, Sinif.Yazarİsimleri_, Sinif.KitapFiyat_,Sinif.kitapYayincilari)
         Birlestir = list(Birlestir)
         Birlestir = dict(zip(range(len(Birlestir)), Birlestir))
         Sinif.Sozluk['Kitap'] = Birlestir
@@ -77,18 +85,19 @@ class Sinif:
 
      
     def Yazdir(self):
-        with open("Veri.json", "w", encoding="utf-8") as file:
+        with open("Veri.json", "w", encoding="UTF-8") as file:
             json.dump(Sinif.Sozluk,file)
 
     def read(self):
-        with open("Veri.json", "r", encoding="utf-8") as file:
+        with open("Veri.json", "r", encoding="UTF-8") as file:
             data = json.load(file)
         kitaplar = data["Kitap"]
         kitap = [kitap[0].strip() for kitap in kitaplar.values()]
         yazar=[kitap[1].strip() for kitap in kitaplar.values()]
         fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
+        kitapYayinci=[kitap[3].strip() for kitap in kitaplar.values()]
         sayi=-1
-        for kitap,yazar,fiyat in zip(kitap,yazar,fiyat):
+        for kitap,yazar,fiyat,kitapYayinci in zip(kitap,yazar,fiyat,kitapYayinci):
             sayi+=1
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
@@ -97,6 +106,7 @@ class Sinif:
                 'isim':kitap,
                 'yazar':yazar,
                 'fiyat':fiyat,
+                'Yayin':kitapYayinci
                    }]
             
             collection.insert_many(data)
