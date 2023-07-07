@@ -16,7 +16,7 @@ class Sinif:
     Sozluk={}
     
 
-    def __init__(self,url,BookName,authorname,book_Price,broadcaster) -> None:
+    def __init__(self,url,BookName,authorname,book_Price,broadcaster,veritabani,jsonDosyası):
         self.url=url
         self.html=requests.get(self.url).content
         self.soup=BeautifulSoup(self.html,"html.parser")
@@ -24,20 +24,22 @@ class Sinif:
         self.authorname=authorname
         self.book_Price=book_Price
         self.broadcaster=broadcaster
-        # self.veritabani=veritabani
+        self.veritabani=veritabani
+        self.jsonDosyası=jsonDosyası
+        
         
     def run(self):
-        # Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
+        Sinif.Dbclear(self)# Veritabanından bulunan verilerin silinmesi
         Sinif.kitapİsim(self)
         Sinif.KitapFiyat(self)
-        if(self.broadcaster=="div[class='col col-12 currentPrice']"):
+        if(self.broadcaster=="col col-12 text-title mt"):
             Sinif.yayinci2(self)
         else:
-            Sinif.yayinci2(self)
+            Sinif.Yayinci(self)
         Sinif.yazarİsim(self)
         Sinif.birlestir(self)
-        # Sinif.Yazdir(self)
-        # Sinif.read(self)
+        Sinif.Yazdir(self)
+        Sinif.read(self)
         # Sinif.VeriKontrol_(self)
 
     def kitapİsim(self):
@@ -46,7 +48,6 @@ class Sinif:
         for a in Bul:
             a=a.text.strip()
             Sinif.kitapİsimleri_.append(a)
-            print(a)
         # bul_=len(Bul)
         # print(f'Bulunan veri sayısı: {bul_}')
             
@@ -73,7 +74,7 @@ class Sinif:
         # print(Bul)
         for a in Bul:
             a=a.text.strip()
-            print(a)
+            print(a,'Yayinci2')
             Sinif.KitapFiyat_.append(a)
     
     def Yayinci(self):
@@ -98,32 +99,32 @@ class Sinif:
 
      
     def Yazdir(self):
-        with open("Veri.json", "w", encoding="UTF-8") as file:
+        with open(self.jsonDosyası, "w", encoding="utf-8") as file:
             json.dump(Sinif.Sozluk,file)
 
     def read(self):
-        with open("Veri.json", "r", encoding="UTF-8") as file:
+        with open(self.jsonDosyası, "r", encoding="utf-8") as file:
             data = json.load(file)
         kitaplar = data["Kitap"]
         kitap = [kitap[0].strip() for kitap in kitaplar.values()]
-        yazar=[kitap[1].strip() for kitap in kitaplar.values()]
-        fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
-        kitapYayinci=[kitap[3].strip() for kitap in kitaplar.values()]
-        for kitap,yazar,fiyat,kitapYayinci in zip(kitap,yazar,fiyat,kitapYayinci):
+        yazar = [kitap[1].strip() for kitap in kitaplar.values()]
+        fiyat = [kitap[2].strip() for kitap in kitaplar.values()]
+        kitapYayinci = [kitap[3].strip() for kitap in kitaplar.values()]
+        for kitap, yazar, fiyat, kitapYayinci in zip(kitap, yazar, fiyat, kitapYayinci):
             client = MongoClient('mongodb://localhost:27017')
             db = client['smartmaple']
             collection = db[self.veritabani]
-            data=[{
-                'isim':kitap,
-                'yazar':yazar,
-                'fiyat':fiyat,
-                'Yayin':kitapYayinci
-                   }]
-            
+            data = [{
+                'isim': kitap,
+                'yazar': yazar,
+                'fiyat': fiyat,
+                'Yayin': kitapYayinci
+            }]
+
             collection.insert_many(data)
             
     def veriDosyasiAdet(self):
-        with open("Veri.json", "r", encoding="utf-8") as file:
+        with open(self.jsonDosyasi, "r", encoding="utf-8") as file:
             data = json.load(file)
             kitaplar = data["Kitap"]
             kitap = [kitap[0].strip() for kitap in kitaplar.items()]
@@ -135,8 +136,8 @@ class Sinif:
         db = client["smartmaple"]
         collection = db[self.veritabani]
 
-        Json_Dosyaları = open('Veri.json')
-        Json_Dosyaları = json.load(Json_Dosyaları)
+        Json_Dosyaları = open(self.jsonDosyası)
+        Json_Dosyaları = json.load(self.jsonDosyası)
 
         results = collection.find()
         for document in Json_Dosyaları :
@@ -149,7 +150,7 @@ class Sinif:
         # MongoDB'ye bağlanın
         client = MongoClient('mongodb://localhost:27017/')
         db = client['smartmaple']  # veritabanını seçin
-        collection = db['']  # koleksiyonu seçin
+        collection = db[self.veritabani]  # koleksiyonu seçin
 
         # Tüm kayıtları silin
         result = collection.delete_many({})
@@ -161,25 +162,28 @@ class Sinif:
     # yazar=[kitap[1].strip() for kitap in kitaplar.values()]
     # fiyat=[kitap[2].strip() for kitap in kitaplar.values()]
     # sayi=-1
+
 veritabani='kitapyurdu'
-BookName="li.mg-b-10>div>div:nth-child(7)>a"
+BookName="li.mg-b-10>div>div:nth-child(4)>a"
 authorname="li.mg-b-10>div>div:nth-child(7)>a"
 book_Price="li.mg-b-10>div>div:nth-child(8)>div:nth-child(2)>span:nth-child(2)"#Kitap Fiyatları
 broadcaster='li.mg-b-10>div>div:nth-child(4)>a'
-
-# KitapYurdu=Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html",BookName,authorname,book_Price,broadcaster,veritabani)
-# KitapYurdu.run()
+Veritabani='kitapyurdu'
+jsonDosyası='veri.json'
+KitapYurdu=Sinif("https://www.kitapyurdu.com/kategori/kitap/1.html",BookName,authorname,book_Price,broadcaster,veritabani,jsonDosyası)
+KitapYurdu.run()
 
 
 # veritabani='kitapyurdu'
-BookName_="a[class='fl col-12 text-description detailLink']"
-authorname_="a[id='productModelText']"
-book_Price_="div[class='col col-12 currentPrice']"#Kitap Fiyatları
-broadcaster_="div[class='col col-12 currentPrice']"
+# BookName="a[class='fl col-12 text-description detailLink']"
+# authorname="a[id='productModelText']"
+# book_Price="div[class='col col-12 currentPrice']"#Kitap Fiyatları
+# broadcaster="col col-12 text-title mt"
+# veritabani='kitapsepeti'
+# jsonDosyası='KitapSepeti.json'
 
-
-KitapSepeti=Sinif("https://www.kitapsepeti.com/roman",BookName_,authorname_,book_Price_,broadcaster_)
-KitapSepeti.run()
+# KitapSepeti=Sinif("https://www.kitapsepeti.com/roman",BookName,authorname,book_Price,broadcaster,veritabani,jsonDosyası)
+# KitapSepeti.run()
 
 # url=requests.get("https://www.doviz.com").content
 # soup=BeautifulSoup(url,"html.parser")
