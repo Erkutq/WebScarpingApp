@@ -3,7 +3,6 @@ import time
 from bs4 import BeautifulSoup
 import requests
 import pandas
-import pymongo
 from pymongo import MongoClient
 import schedule
 
@@ -201,13 +200,15 @@ def KoduCalistir():
 # seçim yapmak istiyorsak bu şekilde
 # schedule.every().day.at('12:00').do(KoduCalistir)
 
+KoduCalistir()
 
 
-#Buradaki kodlar kodumuzun her gün saat 12 çalışmasını sağlıyacak eğer seçim yapmak istemiyorsak kodu bu şekilde çalıştırırız.
-schedule.every().day.at('12:00').do(kitapSepeti)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+#Buradaki kodlar kodumuzun her gün saat 12 çalışmasını sağlıyacak eğer seçim yapmak istemiyorsak kodu bu şekilde çalıştırırız. Kitap sepeti yerine fonksiyon ismi girebilirsiniz
+# schedule.every().day.at('12:00').do(kitapSepeti)
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
 
